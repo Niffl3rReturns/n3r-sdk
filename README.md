@@ -58,24 +58,14 @@ const signerPrizeDistributor = new PrizeDistributor(
 
 ## Examples
 
-### Get token data for a Prize Pool
+### Get token data of a Prize Pool
 
 ```js
 const tokenData = await prizePool.getTokenData() // Underlying token (ex. USDC)
 const ticketData = await prizePool.getTicketData() // Ticket token
 ```
 
-### Get a users deposit token & ticket balances
-
-```js
-const usersBalances: {
-  chainId: number,
-  address: string,
-  balances: PrizePoolTokenBalances
-}[] = await PrizePoolNetwork.getUsersPrizePoolBalances(usersAddress)
-```
-
-### Get a users deposit token & ticket balance
+### Get deposit token & ticket balance of a user
 
 ```js
 const balance: PrizePoolTokenBalances = await prizePool.getUsersPrizePoolBalances(usersAddress)
@@ -125,7 +115,7 @@ Valid draw ids are draw ids that have all of the relevant data pushed to their r
 const drawIds = await prizeDistributor.getValidDrawIds()
 ```
 
-### Get a users prizes
+### Check prizes of a user
 
 ```js
 const drawResults = await PrizeApi.getUsersDrawResultsByDraw(
@@ -137,7 +127,7 @@ const drawResults = await PrizeApi.getUsersDrawResultsByDraw(
 )
 ```
 
-### Claim a users prizes
+### Claim prizes as a user
 
 NOTE: Ensure the `PrizeDistributor` was initialized with a `Signer`
 
