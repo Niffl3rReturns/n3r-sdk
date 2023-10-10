@@ -1,30 +1,20 @@
 {
-  "name": "@pooltogether/v4-client-js",
-  "author": "PoolTogether Inc.",
-  "description": "Client library for simple interactions with PoolTogether V4 contracts.",
-  "module": "dist/v4-client-js.esm.js",
-  "version": "1.18.1",
+  "name": "@niffl3rreturns/n3r-sdk",
+  "description": "Client library to interact with N3R contracts.",
+  "module": "dist/n3r-sdk.esm.js",
+  "version": "1.0.0",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "bugs": {
-    "url": "https://github.com/pooltogether/issues",
-    "email": "bugs@pooltogether.com"
-  },
   "files": [
     "dist",
     "src"
   ],
-  "homepage": "https://github.com/pooltogether/v4-client-js",
   "engines": {
     "node": ">=16"
   },
-  "repository": {
-    "url": "https://github.com/pooltogether/v4-client-js",
-    "type": "git"
-  },
   "scripts": {
-    "start": "tsdx watch --onSuccess \"yalc push\"",
+    "start": "tsdx watch",
     "reinstall": "rm -rf node_modules && yarn install",
     "build": "tsdx build",
     "test": "tsdx test",
@@ -32,7 +22,6 @@
     "test:coverage": "tsdx test --coverage",
     "lint": "tsdx lint src",
     "lint:fix": "tsdx lint src --fix",
-    "prepare": "tsdx build",
     "size": "size-limit",
     "analyze": "size-limit --why",
     "docs": "yarn docs:md ; yarn docs:clean",

@@ -1,6 +1,6 @@
 import { Provider } from '@ethersproject/abstract-provider'
 import { batch, contract } from '@pooltogether/etherplex'
-import { deserializeBigNumbers, NETWORK } from '@pooltogether/utilities'
+import { deserializeBigNumbers } from '@pooltogether/utilities'
 import {
   computeUserWinningPicksForRandomNumber,
   Draw,
@@ -17,14 +17,7 @@ import { formatDrawResultsFromPrizes } from './utils/formatDrawResultsFromPrizes
 /**
  * Currently the Prize API is only running for a select group of networks.
  */
-const PRIZE_API_SUPPORTED_NETWORKS = Object.freeze([
-  NETWORK.avalanche,
-  NETWORK.mainnet,
-  NETWORK.polygon,
-  NETWORK.optimism,
-  NETWORK['goerli'],
-  NETWORK['optimism-goerli']
-])
+const PRIZE_API_SUPPORTED_NETWORKS: readonly number[] = Object.freeze([])
 
 /**
  * PoolTogether Prize API.
