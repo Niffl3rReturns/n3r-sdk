@@ -14,6 +14,8 @@ import { createEmptyDrawResult } from './utils/createEmptyDrawResult'
 import { formatDrawResultsFromLegacyDrawResults } from './utils/formatDrawResultsFromLegacyDrawResults'
 import { formatDrawResultsFromPrizes } from './utils/formatDrawResultsFromPrizes'
 
+import axios, { AxiosInstance } from 'axios'
+
 /**
  * Currently the Prize API is only running for a select group of networks.
  */
@@ -24,6 +26,14 @@ const PRIZE_API_SUPPORTED_NETWORKS: readonly number[] = Object.freeze([])
  * Provides easy access to PoolTogether Prize APIs.
  */
 export class PrizeApi {
+  client: AxiosInstance
+
+  constructor(baseURL: string) {
+    this.client = axios.create({
+      baseURL
+    })
+  }
+
   /**
    * Fetches a users DrawResults for the provided draw id
    * @param chainId the chain id the PrizeDistributor is deployed on
@@ -32,19 +42,17 @@ export class PrizeApi {
    * @param drawId the id of the draw to check
    * @param maxPicksPerUser the maximum number of picks per user
    */
-  static async getUsersDrawResultsByDraw(
+  async getUsersDrawResultsByDraw(
     chainId: number,
     usersAddress: string,
     prizeDistributorAddress: string,
-    drawId: number,
-    maxPicksPerUser: number
+    drawId: number
   ): Promise<DrawResults> {
     const drawResults = await this.getUsersDrawResultsByDraws(
       chainId,
       usersAddress,
       prizeDistributorAddress,
-      [drawId],
-      [maxPicksPerUser]
+      [drawId]
     )
     return drawResults[drawId]
   }
@@ -56,53 +64,24 @@ export class PrizeApi {
    * @param usersAddress the address of the user to fetch draw results for
    * @param prizeDistributorAddress the address of the PrizeDistributor to fetch prizes for
    * @param drawIds a list of draw ids to check for prizes
-   * @param maxPicksPerUserPerDraw the maximum number of picks per user for each drwa
    */
-  static async getUsersDrawResultsByDraws(
+  async getUsersDrawResultsByDraws(
     chainId: number,
     usersAddress: string,
     prizeDistributorAddress: string,
-    drawIds: number[],
-    maxPicksPerUserPerDraw: number[]
+    drawIds: number[]
   ): Promise<{ [drawId: number]: DrawResults }> {
     const drawResults: { [drawId: number]: DrawResults } = {}
 
-    const drawResultsPromises = drawIds.map(async (drawId, index) => {
+    const drawResultsPromises = drawIds.map(async (drawId) => {
       try {
-        // Check if Prize API supports network, if not, use CloudFlare
-        if (!PRIZE_API_SUPPORTED_NETWORKS.includes(chainId)) {
-          console.warn(
-            `Prize API only supports networks: ${PRIZE_API_SUPPORTED_NETWORKS.join(', ')}.`
-          )
-          const drawResult = await this.computeDrawResultsOnCloudFlareWorker(
-            chainId,
-            usersAddress,
-            prizeDistributorAddress,
-            drawId
-          )
-          drawResults[drawId] = drawResult
-        } else {
-          // Check if Prize API executed for the draw id requested, if not, use CloudFlare
-          const apiStatus = await this.checkPrizeApiStatus(chainId, prizeDistributorAddress, drawId)
-          if (apiStatus) {
-            const drawResult = await this.getDrawResultsFromPrizeApi(
-              chainId,
-              usersAddress,
-              prizeDistributorAddress,
-              drawId,
-              maxPicksPerUserPerDraw[index]
-            )
-            drawResults[drawId] = drawResult
-          } else {
-            const drawResult = await this.computeDrawResultsOnCloudFlareWorker(
-              chainId,
-              usersAddress,
-              prizeDistributorAddress,
-              drawId
-            )
-            drawResults[drawId] = drawResult
-          }
-        }
+        const drawResult = await this.requestDrawResults(
+          chainId,
+          usersAddress,
+          prizeDistributorAddress,
+          drawId
+        )
+        drawResults[drawId] = drawResult
       } catch (e) {
         const error = e as Error
         console.error(error.message)
@@ -157,23 +136,22 @@ export class PrizeApi {
    * @param prizeDistributorAddress
    * @param drawId
    */
-  static async computeDrawResultsOnCloudFlareWorker(
+  async requestDrawResults(
     chainId: number,
-    usersAddress: string,
+    userAddress: string,
     prizeDistributorAddress: string,
     drawId: number
   ) {
-    const url = this.getCloudFlareDrawResultsUrl(
-      chainId,
-      prizeDistributorAddress,
-      usersAddress,
-      drawId
-    )
-    const response = await fetch(url)
-    const drawResultsJson = await response.json()
-    const LEGACY_drawResult: LEGACYDrawResults = deserializeBigNumbers(drawResultsJson)
-    const drawResult = formatDrawResultsFromLegacyDrawResults(LEGACY_drawResult)
-    return drawResult
+    const response = await this.client.get('/prizes', {
+      params: {
+        chainId,
+        distributor: prizeDistributorAddress,
+        user: userAddress,
+        drawId
+      }
+    })
+    const legacyDrawResult: LEGACYDrawResults = deserializeBigNumbers(response.data)
+    return formatDrawResultsFromLegacyDrawResults(legacyDrawResult)
   }
 
   /**

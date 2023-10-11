@@ -8,7 +8,6 @@ import { BigNumber, ethers } from 'ethers'
 
 import ERC20Abi from './abis/ERC20Abi'
 import { ContractType } from './constants'
-import { PrizeApi } from './PrizeApi'
 import {
   Claim,
   Contract as ContractMetadata,
@@ -110,30 +109,6 @@ export class PrizeDistributor {
   }
 
   //////////////////////////// Ethers write functions ////////////////////////////
-
-  /**
-   * Fetches a users prizes for the provided draw and submits a transaction to claim them to the Signer.
-   * PrizeDistributor must be initialized with a Signer.
-   * @param drawId the draw id to claim prizes for
-   * @param maxPicksPerUser the maximum picks per user from the PrizeDistribution for the provided draw id
-   * @param overrides optional overrides for the transaction creation
-   * @returns the transaction response
-   */
-  async claimPrizesByDraw(
-    drawId: number,
-    maxPicksPerUser: number,
-    overrides?: Overrides
-  ): Promise<TransactionResponse> {
-    const errorPrefix = 'PrizeDistributors [claim] | '
-    const usersAddress = await this.getUsersAddress(errorPrefix)
-
-    const drawResults = await this.getUsersDrawResultsForDrawId(
-      usersAddress,
-      drawId,
-      maxPicksPerUser
-    )
-    return this.claimPrizesByDrawResults(drawResults, overrides)
-  }
 
   /**
    * Submits a transaction to claim a users prizes
@@ -652,48 +627,6 @@ export class PrizeDistributor {
       drawIds
     )
     return result[0]
-  }
-
-  /**
-   * Fetches the claimable prizes a user won for a specific Draw.
-   * @param usersAddress the users address to fetch prizes for
-   * @param drawId the draw id to fetch prizes for
-   * @param maxPicksPerUser the maximum number of picks per user from the matching prize distribution
-   * @returns the results for user for the provided draw
-   */
-  async getUsersDrawResultsForDrawId(
-    usersAddress: string,
-    drawId: number,
-    maxPicksPerUser: number
-  ): Promise<DrawResults> {
-    return PrizeApi.getUsersDrawResultsByDraw(
-      this.chainId,
-      usersAddress,
-      this.prizeDistributorMetadata.address,
-      drawId,
-      maxPicksPerUser
-    )
-  }
-
-  /**
-   * Fetches the claimable prizes a user won for multiple Draws.
-   * @param usersAddress the users address to fetch prizes for
-   * @param drawIds the draw ids to fetch prizes for
-   * @param maxPicksPerUserPerDraw the maximum number of picks per user from the matching prize distribution for each draw
-   * @returns the results for user for the provided draw
-   */
-  async getUsersDrawResultsForDrawIds(
-    usersAddress: string,
-    drawIds: number[],
-    maxPicksPerUserPerDraw: number[]
-  ): Promise<{ [drawId: number]: DrawResults }> {
-    return PrizeApi.getUsersDrawResultsByDraws(
-      this.chainId,
-      usersAddress,
-      this.prizeDistributorMetadata.address,
-      drawIds,
-      maxPicksPerUserPerDraw
-    )
   }
 
   // NOTE: Claimed event functions commented out as events on networks other than Ethereum mainnet are unreliable.
