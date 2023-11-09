@@ -2,7 +2,7 @@
   "name": "@niffl3rreturns/n3r-sdk",
   "description": "Client library to interact with N3R contracts.",
   "module": "dist/n3r-sdk.esm.js",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",

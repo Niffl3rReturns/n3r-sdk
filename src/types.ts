@@ -1,4 +1,5 @@
 import { Provider } from '@ethersproject/abstract-provider'
+import { DrawResults } from '@pooltogether/v4-utils-js'
 import { BigNumber, Signer } from 'ethers'
 
 export {
@@ -45,6 +46,18 @@ export interface LEGACYDrawResults {
   drawId: number
   totalValue: BigNumber
   prizes: LEGACYPrize[]
+}
+
+export interface ExtendedLEGACYDrawResults extends LEGACYDrawResults {
+  normalizedBalance: BigNumber
+  beaconPeriodStartedAt: number
+  beaconPeriodEndedAt: number
+}
+
+export interface ExtendedDrawResults extends DrawResults {
+  normalizedBalance: BigNumber
+  beaconPeriodStartedAt: number
+  beaconPeriodEndedAt: number
 }
 
 export interface LEGACYPrize {

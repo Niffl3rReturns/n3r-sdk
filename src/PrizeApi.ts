@@ -9,7 +9,7 @@ import {
 import { BigNumber } from 'ethers'
 
 import { PrizeApiStatus } from './constants'
-import { DrawResults, LEGACYDrawResults, Prize, PrizeDistribution } from './types'
+import { DrawResults, ExtendedDrawResults, ExtendedLEGACYDrawResults, Prize, PrizeDistribution } from './types'
 import { createEmptyDrawResult } from './utils/createEmptyDrawResult'
 import { formatDrawResultsFromLegacyDrawResults } from './utils/formatDrawResultsFromLegacyDrawResults'
 import { formatDrawResultsFromPrizes } from './utils/formatDrawResultsFromPrizes'
@@ -70,8 +70,8 @@ export class PrizeApi {
     usersAddress: string,
     prizeDistributorAddress: string,
     drawIds: number[]
-  ): Promise<{ [drawId: number]: DrawResults }> {
-    const drawResults: { [drawId: number]: DrawResults } = {}
+  ): Promise<{ [drawId: number]: ExtendedDrawResults }> {
+    const drawResults: { [drawId: number]: ExtendedDrawResults } = {}
 
     const drawResultsPromises = drawIds.map(async (drawId) => {
       try {
@@ -150,7 +150,7 @@ export class PrizeApi {
         drawId
       }
     })
-    const legacyDrawResult: LEGACYDrawResults = deserializeBigNumbers(response.data)
+    const legacyDrawResult: ExtendedLEGACYDrawResults = deserializeBigNumbers(response.data)
     return formatDrawResultsFromLegacyDrawResults(legacyDrawResult)
   }
 
